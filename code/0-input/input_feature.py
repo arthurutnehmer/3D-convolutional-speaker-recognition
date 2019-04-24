@@ -10,8 +10,11 @@ import sys
 from random import shuffle
 import speechpy
 import datetime
+import tables
 
-
+#Root file path "change to indicate where the project is located".
+global root_file_path
+root_file_path= "/media/arthur/95e74925-a6a1-4afa-b4e4-2c932ae2948c/3D-convolutional-speaker-recognition/"
 ######################################
 ####### Define the dataset class #####
 ######################################
@@ -222,12 +225,12 @@ if __name__ == '__main__':
     # Example of each line: 0 subject/sound.wav
     parser.add_argument('--file_path',
                         default=os.path.expanduser(
-                            '~/github/3D-convolutional-speaker-recognition/code/0-input/file_path.txt'),
+                            root_file_path + 'code/0-input/file_path.txt'),
                         help='The file names for development phase')
 
     # The directory of the audio files separated by subject
     parser.add_argument('--audio_dir',
-                        default=os.path.expanduser('~/github/3D-convolutional-speaker-recognition/code/0-input/Audio'),
+                        default=os.path.expanduser(root_file_path + 'code/0-input/Audio'),
                         help='Location of sound files')
     args = parser.parse_args()
 
@@ -237,7 +240,18 @@ if __name__ == '__main__':
     # idx is the representation of the batch size which chosen to be as one sample (index) from the data.
     # ex: batch_features = [dataset.__getitem__(idx)[0] for idx in range(32)] 
     # The batch_features is a list and len(batch_features)=32.
+    #The feature contains an array of size 1, 20, 80, 40.
     idx = 0
     feature, label = dataset.__getitem__(idx)
     print(feature.shape)
     print(label)
+
+    lab = []
+    lab.append(label)
+
+    h5file = tables.open_file(root_file_path + '/code/enrollment-evaluation_sample_dataset.hdf5', 'w')
+    label_test = h5file.create_carray(where = '/', name = 'label_enrollment', obj = lab, byteorder = 'little')
+    label_array = h5file.create_carray(where = '/', name = 'label_evaluation', obj = lab, byteorder = 'little')
+    utterance_test = h5file.create_earray(where = '/', name = 'utterance_enrollment', chunkshape = [1,20,80,40], obj = feature, byteorder = 'little')
+    utterance_train = h5file.create_earray(where = '/', name = 'utterance_evaluation', chunkshape = [1,20,80,40], obj = feature, byteorder = 'little')
+    h5file.close()
