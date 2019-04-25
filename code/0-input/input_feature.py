@@ -13,7 +13,6 @@ import datetime
 import tables
 
 #Root file path "change to indicate where the project is located".
-global root_file_path
 root_file_path= "/media/arthur/95e74925-a6a1-4afa-b4e4-2c932ae2948c/3D-convolutional-speaker-recognition/"
 ######################################
 ####### Define the dataset class #####
@@ -238,7 +237,7 @@ if __name__ == '__main__':
                            transform=Compose([CMVN(), Feature_Cube(cube_shape=(20, 80, 40), augmentation=True), ToOutput()]))
    
     # idx is the representation of the batch size which chosen to be as one sample (index) from the data.
-    # ex: batch_features = [dataset.__getitem__(idx)[0] for idx in range(32)] 
+    # ex: batch_features = [dataset.__getitem__(idx)[0] for idx in range(32)]
     # The batch_features is a list and len(batch_features)=32.
     #The feature contains an array of size 1, 20, 80, 40.
     idx = 0
@@ -246,12 +245,15 @@ if __name__ == '__main__':
     print(feature.shape)
     print(label)
 
-    lab = []
-    lab.append(label)
+    lab = [label]
+    featTest = []
+    featTest =  feature.swapaxes(1, 2).swapaxes(2, 3).swapaxes(0, 3)
 
     h5file = tables.open_file(root_file_path + '/code/enrollment-evaluation_sample_dataset.hdf5', 'w')
     label_test = h5file.create_carray(where = '/', name = 'label_enrollment', obj = lab, byteorder = 'little')
     label_array = h5file.create_carray(where = '/', name = 'label_evaluation', obj = lab, byteorder = 'little')
-    utterance_test = h5file.create_earray(where = '/', name = 'utterance_enrollment', chunkshape = [1,20,80,40], obj = feature, byteorder = 'little')
-    utterance_train = h5file.create_earray(where = '/', name = 'utterance_evaluation', chunkshape = [1,20,80,40], obj = feature, byteorder = 'little')
+    utterance_test = h5file.create_earray(where = '/', name = 'utterance_enrollment', chunkshape = [20,80,40,1], obj = featTest, byteorder = 'little')
+    utterance_train = h5file.create_earray(where = '/', name = 'utterance_evaluation', chunkshape = [20,80,40,1], obj = featTest, byteorder = 'little')
     h5file.close()
+
+    print featTest.shape

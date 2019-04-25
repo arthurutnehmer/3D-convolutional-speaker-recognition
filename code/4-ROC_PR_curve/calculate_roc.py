@@ -47,7 +47,7 @@ for split_num in range(k):
     EER_temp,AUC_temp,AP,fpr, tpr = calculate_eer_auc_ap(label[index_start:index_end],score[index_start:index_end])
     EER_VECTOR[split_num] = EER_temp * 100
     AUC_VECTOR[split_num] = AUC_temp * 100
-
+    print score
 print("EER=",np.mean(EER_VECTOR),np.std(EER_VECTOR))
 print("AUC=",np.mean(AUC_VECTOR),np.std(AUC_VECTOR))
 

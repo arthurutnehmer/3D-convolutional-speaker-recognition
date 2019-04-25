@@ -248,7 +248,6 @@ def main(_):
 
                             # Accuracy calculation
                             accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-
                             # # ##### call the optimizer ######
                             # # # TODO: call optimizer object outside of this gpu environment
                             # #
